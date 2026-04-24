@@ -10,7 +10,7 @@ pub async fn handle_fraud_score(
     Context(state): Context<'_, AppState>,
 ) -> Json<ResponsePayload> {
     let vector = vectorize(&payload, &state.config, &state.mcc_risk);
-    let fraud_score = calculate_fraud_score(&vector, &state.references);
+    let fraud_score = calculate_fraud_score(&vector, &state.vectors, &state.labels);
 
     Json(ResponsePayload {
         approved: fraud_score < 0.6,

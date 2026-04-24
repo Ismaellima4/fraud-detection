@@ -1,23 +1,31 @@
-pub fn calculate_fraud_score(input: &[f32; 14], references: &[([f32; 14], u8)]) -> f32 {
-    let mut distances: Vec<(f32, u8)> = references
-        .iter()
-        .map(|(v, is_fraud)| {
-            let mut dist = 0.0;
-            for i in 0..14 {
-                dist += (input[i] - v[i]).powi(2);
+pub fn calculate_fraud_score(input: &[f32; 14], vectors: &[f32], labels: &[u8]) -> f32 {
+    const K: usize = 5;
+    let mut best_dist_sq = [f32::MAX; K];
+    let mut best_labels = [0u8; K];
+
+    let n = labels.len();
+    for i in 0..n {
+        let v_offset = i * 14;
+        let v = &vectors[v_offset..v_offset + 14];
+        
+        let mut dist_sq = 0.0;
+        for j in 0..14 {
+            let diff = input[j] - v[j];
+            dist_sq += diff * diff;
+        }
+
+        if dist_sq < best_dist_sq[K - 1] {
+            let mut pos = K - 1;
+            while pos > 0 && best_dist_sq[pos - 1] > dist_sq {
+                best_dist_sq[pos] = best_dist_sq[pos - 1];
+                best_labels[pos] = best_labels[pos - 1];
+                pos -= 1;
             }
-            (dist, *is_fraud)
-        })
-        .collect();
+            best_dist_sq[pos] = dist_sq;
+            best_labels[pos] = labels[i];
+        }
+    }
 
-    let k = 5;
-    distances.select_nth_unstable_by(k - 1, |a, b| a.0.partial_cmp(&b.0).unwrap());
-
-    let fraud_count = distances
-        .iter()
-        .take(k)
-        .filter(|(_, is_fraud)| *is_fraud == 1)
-        .count();
-
-    fraud_count as f32 / k as f32
+    let fraud_count = best_labels.iter().filter(|&&l| l == 1).count();
+    fraud_count as f32 / K as f32
 }
