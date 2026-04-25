@@ -23,17 +23,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut output = File::create(output_path)?;
 
-    for (i, ref_data) in references.iter().enumerate() {
+    for (_i, ref_data) in references.iter().enumerate() {
         for &val in &ref_data.vector {
-            output.write_all(&val.to_le_bytes())?;
+            let quantized = (((val + 1.0) / 2.0) * 65535.0).round().clamp(0.0, 65535.0) as u16;
+            output.write_all(&quantized.to_le_bytes())?;
         }
 
         let label_byte = if ref_data.label == "fraud" { 1u8 } else { 0u8 };
         output.write_all(&[label_byte])?;
-
-        if i % 10000 == 0 && i > 0 {
-            println!("Processed {} items...", i);
-        }
     }
 
     println!("Sucess! Binary file saved to {}", output_path);

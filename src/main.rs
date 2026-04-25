@@ -14,7 +14,7 @@ use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub vectors: Arc<Vec<f32>>,
+    pub vectors: Arc<Vec<u16>>,
     pub labels: Arc<Vec<u8>>,
     pub mcc_risk: Arc<HashMap<String, f32>>,
     pub config: NormalizationConfig,
@@ -36,15 +36,16 @@ async fn main() {
 
     let bin_data = fs::read("resources/references.bin").expect("Binary references not found");
 
-    let num_records = bin_data.len() / 57;
+    let num_records = bin_data.len() / 29;
     let mut vectors = Vec::with_capacity(num_records * 14);
     let mut labels = Vec::with_capacity(num_records);
 
-    for chunk in bin_data.chunks_exact(57) {
-        for bytes_chunk in chunk[..56].chunks_exact(4) {
-            vectors.push(f32::from_le_bytes(bytes_chunk.try_into().unwrap()));
+    for chunk in bin_data.chunks_exact(29) {
+        for j in 0..14 {
+            let start = j * 2;
+            vectors.push(u16::from_le_bytes([chunk[start], chunk[start + 1]]));
         }
-        labels.push(chunk[56]);
+        labels.push(chunk[28]);
     }
 
     let state = AppState {

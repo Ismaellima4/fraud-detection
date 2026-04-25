@@ -1,16 +1,21 @@
-pub fn calculate_fraud_score(input: &[f32; 14], vectors: &[f32], labels: &[u8]) -> f32 {
+pub fn calculate_fraud_score(input: &[f32; 14], vectors: &[u16], labels: &[u8]) -> f32 {
     const K: usize = 5;
-    let mut best_dist_sq = [f32::MAX; K];
+    let mut best_dist_sq = [u64::MAX; K];
     let mut best_labels = [0u8; K];
+
+    let mut q_input = [0u16; 14];
+    for i in 0..14 {
+        q_input[i] = (((input[i] + 1.0) / 2.0) * 65535.0).round().clamp(0.0, 65535.0) as u16;
+    }
 
     let n = labels.len();
     for i in 0..n {
         let v_offset = i * 14;
-        let v = &vectors[v_offset..v_offset + 14];
+        let v: &[u16; 14] = vectors[v_offset..v_offset + 14].try_into().unwrap();
         
-        let mut dist_sq = 0.0;
+        let mut dist_sq = 0u64;
         for j in 0..14 {
-            let diff = input[j] - v[j];
+            let diff = q_input[j].abs_diff(v[j]) as u64;
             dist_sq += diff * diff;
         }
 
