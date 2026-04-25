@@ -1,0 +1,7 @@
+/target
+/containerization
+.git
+.gitignore
+README.md
+CHANGELOG.md
+resources/result.json
