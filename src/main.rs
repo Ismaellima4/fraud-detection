@@ -5,9 +5,10 @@ mod vectorizer;
 
 use crate::handlers::handle_fraud_score;
 use crate::models::NormalizationConfig;
-use ohkami::claw::status;
-use ohkami::fang::Context;
-use ohkami::prelude::*;
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use std::collections::HashMap;
 use std::fs;
 use std::sync::Arc;
@@ -20,13 +21,11 @@ pub struct AppState {
     pub config: NormalizationConfig,
 }
 
-impl ohkami::FangAction for AppState {}
-
-async fn handle_ready() -> status::NoContent {
-    status::NoContent
+async fn handle_ready() -> &'static str {
+    ""
 }
 
-#[monoio::main(timer = true)]
+#[tokio::main]
 async fn main() {
     let config = NormalizationConfig::load();
 
@@ -55,11 +54,15 @@ async fn main() {
         config,
     };
 
-    let ohkami = Ohkami::new((
-        Context::new(state),
-        "/ready".GET(handle_ready),
-        "/fraud-score".POST(handle_fraud_score),
-    ));
+    let app = Router::new()
+        .route("/ready", get(handle_ready))
+        .route("/fraud-score", post(handle_fraud_score))
+        .with_state(state);
 
-    ohkami.howl("0.0.0.0:3000").await
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+        .await
+        .unwrap();
+    
+    println!("Listening on 0.0.0.0:3000");
+    axum::serve(listener, app).await.unwrap();
 }

@@ -5,8 +5,8 @@ edition = "2024"
 build = "build.rs"
 
 [dependencies]
-monoio = { version = "0.2", features = ["macros"] }
-ohkami = { version = "0.24", features = ["rt_monoio"] }
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 time = { version = "0.3.37", features = ["serde", "parsing"] }

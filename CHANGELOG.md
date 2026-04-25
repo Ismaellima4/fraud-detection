@@ -2,6 +2,21 @@
 
 Todas as otimizações sistêmicas com foco em performance bruta implementadas para quebrar a métrica e maximizar pontos na *Rinha de Backend 2026*.
 
+## [Unreleased] - Sessão V3 (Atual)
+*(Score Final: 5331.53 | 4.66ms p99)*
+
+### Added
+- **Justfile:** Adicionado suporte ao `just` para automação de tarefas (Docker, k6 tests).
+- **Auto-geração de Dataset via build.rs:** Migração do script manual de geração de binários para um `build.rs` integrado. O arquivo `resources/references.bin` agora é gerado automaticamente durante a compilação a partir do `.gz`.
+
+### Changed
+- **Migração para Axum + Tokio:** Substituição do framework `Ohkami` e runtime `Monoio` pelo stack `Axum/Tokio`. A mudança resultou em uma melhoria de latência de **6.30ms** para **4.66ms** (P99) sob carga pesada.
+- **Refatoração do AppState:** Ajustado para usar `axum::extract::State` e mantido o uso de `Arc` para compartilhamento eficiente de dados entre threads.
+
+### Removed
+- **Workspaces:** Removido o workspace `scripts` em favor da integração direta no ciclo de build do cargo.
+- **Ohkami/Monoio:** Removidas as dependências antigas para simplificar o stack e ganhar performance estável.
+
 ## [Unreleased] - Sessão V2
 *(Score Inicial de Baseline: ~4.000 pts | 80ms p99)*
 *(Score Final Consolidado: 5209.95 | 6.17ms p99)*
