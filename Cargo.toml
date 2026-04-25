@@ -2,6 +2,7 @@
 name = "fraud-detection"
 version = "0.1.0"
 edition = "2024"
+build = "build.rs"
 
 [dependencies]
 monoio = { version = "0.2", features = ["macros"] }
@@ -10,8 +11,13 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 time = { version = "0.3.37", features = ["serde", "parsing"] }
 
+[build-dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+flate2 = "1.0"
+
 [workspace]
-members = ["scripts"]
+members = []
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
