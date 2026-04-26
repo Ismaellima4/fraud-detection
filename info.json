@@ -1,0 +1,10 @@
+{
+  "participants": ["ismaellima4"],
+  "social": [
+    "https://github.com/Ismaellima4",
+    "https://www.linkedin.com/in/ismael-lima-160a2b264/"
+  ],
+  "source-code-repo": "https://github.com/Ismaellima4/fraud-detection",
+  "stack": ["rust", "nginx", "tokio", "axum"],
+  "open_to_work": true
+}
