@@ -25,3 +25,7 @@ up-test: up
 # Sobe o ambiente com build e executa os testes
 build-test: build
     just test
+
+# Publica a imagem no GHCR
+publish-ghcr:
+    ./scripts/publish-ghcr.sh
